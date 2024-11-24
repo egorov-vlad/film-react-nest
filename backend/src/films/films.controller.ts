@@ -1,17 +1,21 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { FilmsService } from './films.service';
+import {
+  FilmsService,
+  IFindAllResponse,
+  IFindByIdResponse,
+} from './films.service';
 
 @Controller('films')
 export class FilmsController {
   constructor(private filmsService: FilmsService) {}
 
-  @Get('/')
-  getFilms() {
+  @Get()
+  getFilms(): Promise<IFindAllResponse> {
     return this.filmsService.findAll();
   }
 
-  @Get('/:id/schedule')
-  getFilmSchedule(@Param('id') id: string) {
+  @Get(':id/schedule')
+  getFilmSchedule(@Param('id') id: string): Promise<IFindByIdResponse> {
     return this.filmsService.findById(id);
   }
 }

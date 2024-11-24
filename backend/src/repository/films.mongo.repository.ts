@@ -1,5 +1,4 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
+import { Inject, Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 
 import { Film, Schedule } from '../films/films.schema';
@@ -7,8 +6,8 @@ import { FilmsDTO } from '../films/dto/films.dto';
 import { GetScheduleDTO } from '../films/dto/schedule.dto';
 
 @Injectable()
-export class FilmsRepository {
-  constructor(@InjectModel('Film') private filmModel: Model<Film>) {}
+export class FilmsMongoRepository {
+  constructor(@Inject('FILMS') private filmModel: Model<Film>) {}
 
   mapFilmsToDTO(film: Film): FilmsDTO {
     return {
