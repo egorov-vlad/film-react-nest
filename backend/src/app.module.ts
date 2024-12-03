@@ -12,6 +12,8 @@ import { FilmsService } from './films/films.service';
 import { filmProvider } from './films/films.provider';
 import { FilmsMongoRepository } from './repository/films.mongo.repository';
 import { FilmsPostgresRepository } from './repository/films.postgres.repository';
+import { LoggerModule } from './logger/logger.module';
+import { FilmsRepository } from './repository/films.repository';
 
 @Module({
   imports: [
@@ -23,6 +25,7 @@ import { FilmsPostgresRepository } from './repository/films.postgres.repository'
       rootPath: path.join(process.cwd(), 'public'),
     }),
     DbModule,
+    LoggerModule,
   ],
   controllers: [FilmsController, OrderController],
   providers: [
@@ -30,6 +33,7 @@ import { FilmsPostgresRepository } from './repository/films.postgres.repository'
     FilmsService,
     filmProvider,
     OrderService,
+    FilmsRepository,
     FilmsMongoRepository,
     FilmsPostgresRepository,
   ],
