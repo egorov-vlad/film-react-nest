@@ -1,9 +1,11 @@
 services:
   frontend:
     build:
-      context: frontend
-    env_file:
-      - frontend/.env
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      VITE_API_URL: ${VITE_API_URL}
+      VITE_CDN_URL: ${VITE_CDN_URL}
     volumes:
       - frontend:/app/frontend/dist
     image: ghcr.io/egorov-vlad/frontend:latest
