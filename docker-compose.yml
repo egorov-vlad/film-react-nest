@@ -1,0 +1,86 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      VITE_API_URL: ${VITE_API_URL}
+      VITE_CDN_URL: ${VITE_CDN_URL}
+    volumes:
+      - frontend:/app/frontend/dist
+    image: ghcr.io/egorov-vlad/frontend:latest
+    networks:
+      - internal
+
+  backend:
+    restart: always
+    build:
+      context: backend
+    env_file:
+      - backend/.env
+    ports:
+      - 3000:3000
+    image: ghcr.io/egorov-vlad/backend:latest
+    networks:
+      - db-network
+      - internal
+    depends_on:
+      - postgres
+
+  postgres:
+    restart: always
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    networks:
+      - db-network
+  pgadmin:
+    restart: always
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
+      - PGADMIN_LISTEN_PORT=8000
+    ports:
+      - 8000:8000
+    networks:
+      - db-network
+    depends_on:
+      - postgres
+  nginx:
+    restart: always
+    build:
+      context: nginx
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./certbot/www:/var/www/certbot/:ro
+      - ./certbot/conf/:/etc/letsencrypt/:ro
+      - frontend:/var/app
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - internal
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - ./certbot/www:/var/www/certbot/:rw
+      - ./certbot/conf/:/etc/letsencrypt/:rw
+    networks:
+      - internal
+
+networks:
+  internal:
+  db-network:
+
+volumes:
+  postgres:
+  frontend:
